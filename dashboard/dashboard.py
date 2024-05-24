@@ -61,7 +61,7 @@ def create_clustering(df):
 
     return clustering
 
-all_df = pd.read_csv("main_data.csv")
+all_df = pd.read_csv("https://github.com/anandashadrina/BikeSharingDataset-Dicoding/blob/main/dashboard/main_data.csv")
 
 datetime_columns = ["dteday"]
 all_df.sort_values(by="dteday", inplace=True)
@@ -74,7 +74,7 @@ min_date = all_df["dteday"].min()
 max_date = all_df["dteday"].max()
 
 with st.sidebar:
-    st.image("logo.png")
+    st.image("https://github.com/anandashadrina/BikeSharingDataset-Dicoding/blob/main/dashboard/logo.png")
     
     start_date, end_date = st.date_input(
         label='Rentang Waktu',min_value=min_date,
@@ -192,7 +192,7 @@ plt.grid(axis='y')
 plt.tight_layout()
 st.pyplot(plt)
 
-st.subheader("Customer Clustering by Day and Hour")
+st.subheader ("Customer Clustering by Day and Hour")
 
 plt.figure(figsize=(12, 8))
 sns.heatmap(clustering, cmap="YlGnBu", annot=False, fmt=".0f")
@@ -238,7 +238,6 @@ ax.set_title("Total of Registered and Casual Customers", fontsize=20)
 
 for i, value in enumerate([total_registered, total_casual]):
     plt.text(i, value + 1000, str(value), ha='center', va='bottom')
-
 st.pyplot(fig)
 
 st.caption('Copyright © anandashadrina 2024')
