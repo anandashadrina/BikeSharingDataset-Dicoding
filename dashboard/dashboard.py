@@ -63,6 +63,7 @@ def create_clustering(df):
 
 all_df = pd.read_csv("https://github.com/anandashadrina/BikeSharingDataset-Dicoding/blob/main/dashboard/main_data.csv")
 
+df['dteday'] = pd.to_datetime(df['dteday'])
 datetime_columns = ["dteday"]
 all_df.sort_values(by="dteday", inplace=True)
 all_df.reset_index(inplace=True)
