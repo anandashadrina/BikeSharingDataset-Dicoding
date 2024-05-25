@@ -76,7 +76,7 @@ min_date = all_df["dteday"].min()
 max_date = all_df["dteday"].max()
 
 with st.sidebar:
-    st.image("https://github.com/anandashadrina/BikeSharingDataset-Dicoding/blob/main/dashboard/logo.png")
+    st.image("https://raw.githubusercontent.com/anandashadrina/BikeSharingDataset-Dicoding/main/dashboard/logo.png")
     
     start_date, end_date = st.date_input(
         label='Rentang Waktu',min_value=min_date,
