@@ -35,15 +35,17 @@ def create_monthly_rentals_df(df):
     return monthly_rentals_df
 
 def create_byhour_df(df):
-    byhour_df = df.groupby('hr')['cnt'].sum().reset_index()
-    byhour_df.rename(columns={"cnt": "total_rentals"}, inplace=True)
+    byhour_df = df.groupby(by="hr").cnt.sum().reset_index()
+    byhour_df.rename(columns={
+        "cnt": "total_customer"
+    }, inplace=True)
 
     return byhour_df
 
 def create_byseasons_df(df):
     byseason_df = df.groupby(by="season").cnt.sum().reset_index()
     byseason_df.rename(columns={
-        "cnt": "Total_Costumer"
+        "cnt": "total_customer"
     }, inplace=True)
     
     return byseason_df
@@ -51,7 +53,7 @@ def create_byseasons_df(df):
 def create_byweather_df(df):
     byweather_df = df.groupby(by="weathersit").cnt.sum().reset_index()
     byweather_df.rename(columns={
-        "cnt": "Total_Costumer"
+        "cnt": "total_customer"
     }, inplace=True)
     
     return byweather_df
@@ -61,9 +63,8 @@ def create_clustering(df):
 
     return clustering
 
-all_df = pd.read_csv("https://github.com/anandashadrina/BikeSharingDataset-Dicoding/blob/main/dashboard/main_data.csv")
+all_df = pd.read_csv("https://raw.githubusercontent.com/anandashadrina/BikeSharingDataset-Dicoding/main/dashboard/main_data.csv")
 
-df['dteday'] = pd.to_datetime(df['dteday'])
 datetime_columns = ["dteday"]
 all_df.sort_values(by="dteday", inplace=True)
 all_df.reset_index(inplace=True)
@@ -150,36 +151,36 @@ st.subheader("Rental Patterns")
 col1, col2 = st.columns(2)
  
 with col1:
-    fig, ax = plt.subplots(figsize=(8,8))
-    sizes = byseason_df['Total_Costumer'].values
-    labels = byseason_df['season']
-    colors_season = [season_colors[label] for label in labels]
-
-    ax.pie(sizes, labels=labels, colors=colors_season, autopct='%1.1f%%', startangle=140, pctdistance=0.85, textprops={'fontsize': 14})
-    centre_circle = plt.Circle((0,0),0.65,fc='white')
-    fig.gca().add_artist(centre_circle)
-
-    ax.axis('equal')
-    ax.set_title("Number of Customer based on Seasons", fontsize=20, pad=20)
-    plt.tight_layout()
+    fig, ax = plt.subplots(figsize=(30,15))
+    sns.barplot(
+        y='total_customer', 
+        x='season',
+        data=byseason_df.sort_values(by='total_customer', ascending=False),
+        palette=season_colors,
+        ax=ax
+    )
+    ax.set_title("Customer based on Season", loc="center", fontsize=50, pad=20)
+    ax.set_ylabel(None)
+    ax.set_xlabel(None)
+    ax.tick_params(axis='x', labelsize=35)
+    ax.tick_params(axis='y', labelsize=30)
     st.pyplot(fig)
-    plt.show()
 
 with col2:
-    fig, ax = plt.subplots(figsize=(8,8))
-    sizes = byweather_df['Total_Costumer'].values
-    labels = byweather_df['weathersit']
-    colors_weather = [weather_colors[label] for label in labels]
-
-    ax.pie(sizes, labels=labels, colors=colors_weather, autopct='%1.1f%%', startangle=140, pctdistance=0.85, textprops={'fontsize': 14})
-    centre_circle = plt.Circle((0,0),0.65,fc='white')
-    fig.gca().add_artist(centre_circle)
-
-    ax.axis('equal')
-    ax.set_title("Number of Customer based on Weather", fontsize=20, pad=20)
-    plt.tight_layout()
+    fig, ax = plt.subplots(figsize=(30,15))
+    sns.barplot(
+        y='total_customer', 
+        x='weathersit',
+        data=byweather_df.sort_values(by='total_customer', ascending=False),
+        palette=weather_colors,
+        ax=ax
+    )
+    ax.set_title("Customer based on Weather", loc="center", fontsize=50, pad=20)
+    ax.set_ylabel(None)
+    ax.set_xlabel(None)
+    ax.tick_params(axis='x', labelsize=35)
+    ax.tick_params(axis='y', labelsize=30)
     st.pyplot(fig)
-    plt.show()
 
 st.subheader("Customer based on Hour")
 
@@ -187,7 +188,7 @@ plt.figure(figsize=(10, 6))
 byhour_df.plot(kind='bar', color='skyblue', legend=False, edgecolor='none', linewidth=2)
 plt.title('Total Bike Rentals by Hour of the Day')
 plt.xlabel('Hour')
-plt.ylabel('Total Rentals')
+plt.ylabel('total_customer')
 plt.xticks(rotation=0)
 plt.grid(axis='y')
 plt.tight_layout()
@@ -204,6 +205,7 @@ plt.ylabel('Day of the Week')
 st.pyplot(plt)
 
 st.subheader('Registered Customer and Casual Customers')
+
 fig, ax = plt.subplots(figsize=(16, 8))
 ax.plot(
     monthly_rentals_df["dteday"],
@@ -216,9 +218,9 @@ plt.plot(
     marker='o', 
     label='Casual Rentals')
 
-ax.set_xlabel("Month", fontsize=15)
-ax.set_ylabel("Total Customers", fontsize=15)
-ax.set_title("Number of Customers)", fontsize=20)
+ax.set_xlabel("Month")
+ax.set_ylabel("Total Customers")
+ax.set_title("Monthly Bike Rentals of Registered and Casual Customers")
 ax.tick_params(axis='y', labelsize=12)
 ax.tick_params(axis='x', labelsize=12)
 ax.legend(fontsize=12)
@@ -226,19 +228,21 @@ ax.grid(True)
 
 st.pyplot(fig)
 
+typecust_colors = ['skyblue', 'gold']
+
+fig, ax = plt.subplots(figsize=(14,8))
 total_registered = daily_rentals_df['total_registered'].sum()
 total_casual = daily_rentals_df['total_casual'].sum()
+labels = ['Registered', 'Casual']
+sizes = [total_registered, total_casual]
+colors_typecust = ['skyblue', 'gold']
 
-fig, ax = plt.subplots(figsize=(10, 6))
+ax.pie(sizes, labels=labels, colors=typecust_colors, autopct='%1.1f%%', startangle=140, pctdistance=0.85, textprops={'fontsize': 14})
 
-sns.barplot(x=["Total Registered", "Total Casual"], y=[total_registered, total_casual], palette="pastel", ax=ax)
+ax.axis('equal')
+plt.tight_layout() 
+ax.set_title("Percentage of Registered vs Casual Customer", fontsize=20 , pad=20)
+st.pyplot(fig) 
 
-ax.set_xlabel("Customer Type", fontsize=15)
-ax.set_ylabel("Total Customers", fontsize=15)
-ax.set_title("Total of Registered and Casual Customers", fontsize=20)
-
-for i, value in enumerate([total_registered, total_casual]):
-    plt.text(i, value + 1000, str(value), ha='center', va='bottom')
-st.pyplot(fig)
 
 st.caption('Copyright © anandashadrina 2024')
